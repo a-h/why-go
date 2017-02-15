@@ -16,18 +16,18 @@
     a {
       color : #7788FF;
     }
-    
+
     h1,
     h2,
     h3 {
       font-family: 'Yanone Kaffeesatz';
       font-weight: normal;
     }
-    
+
     div.remark-slide-content {
       background-color: #333f48;
     }
-    
+
     .remark-code,
     .remark-inline-code {
       font-family: 'Ubuntu Mono';
@@ -149,6 +149,7 @@ class: center, middle
  - Been around for 20 years, well understood
  - Lots of boilerplate code to write, often need an IDE to make sense of it
  - Maven is awful and it takes ages to build anything
+ - Everything is a class, even when it shouldn't be
  - Loads of jobs
 
 ---
@@ -194,7 +195,7 @@ class: center, middle
 ---
 
 ## PHP / Ruby
- 
+
  - No real reason not to try them, just never got into them
 
 ## Erlang / Haskell / Clojure
@@ -209,6 +210,94 @@ class: center, middle
 
 # But the Go language doesn't have 'feature x'
 ### There's lots of things Go doesn't have...
+
+---
+
+### Inheritance
+##### But we prefer composition over inheritance anyway, right?
+
+        package main
+
+        import "fmt"
+
+        type Person struct {
+            Name string
+        }
+
+        func (p Person) Tell() {
+            fmt.Println(p.Name)
+        }
+
+        type Employee {
+            Person
+            PayrollNumber string
+        }
+
+        e := Employee{}
+        e.Tell()
+
+---
+
+### Or, in fact, classes
+##### But any type can have methods
+
+        package main
+
+        import (
+        	"fmt"
+        	"strings"
+        )
+
+        type Name string
+
+        func (n Name) Initials() string {
+        	var initials []rune
+        	for _, part := range strings.Split(string(n), " ") {
+        		runes := []rune(part)
+        		if len(runes) > 0 {
+        			initials = append(initials, runes[0])
+        		}
+        	}
+        	return string(initials)
+        }
+
+        func main() {
+        	name := Name("Joe Bloggs")
+        	fmt.Println(name.Initials())
+        }
+
+---
+
+##### Even function types
+
+        package main
+
+        import (
+        	"fmt"
+        )
+
+        type Accumulator interface {
+        	Accumulate(int, int) int
+        }
+
+        type AccFunc func(int, int) int
+
+        func (f AccFunc) Accumulate(a, b int) int {
+        	return f(a, b)
+        }
+
+        func accumulate(xs []int, base int, acker Accumulator) (result int) {
+        	result = base
+        	for _, x := range xs {
+        		result = acker.Accumulate(result, x)
+        	}
+        	return
+        }
+
+        func main() {
+        	acker := AccFunc(func(a, b int) int { return a + b })
+        	fmt.Println(accumulate([]int{1,2,3}, 0, acker))
+        }
 
 ---
 
@@ -246,7 +335,8 @@ class: center, middle
 
 ---
 
-### Interfaces which define data (in Go, they define functionality and are implemented implicitly)
+### Interfaces that define data
+##### In Go, they define functionality and are implemented implicitly
 
         package main
 
@@ -254,44 +344,47 @@ class: center, middle
 
         func main() {
             p := Person{name: "John"}
-            sayHello(p)
+            announce(p)
             d := Dog{name: "Bimbo"}
-            sayHello(d)
+            announce(p)
         }
 
-        func sayHello(n Named) {
-            fmt.Printf("Hello, %s!\n", n.Name())
+        func announce(s Speaker) {
+            fmt.Println(s.Speak())
         }
 
-        type Named interface {
-            Name() string
+        type Speaker interface {
+            Speak() string
         }
 
         type Person struct {
             name string
         }
 
-        func (p Person) Name() string {
-            return p.name
+        func (p Person) Speak() string {
+            return fmt.Sprintf("My name is %s", p.name)
         }
 
         type Dog struct {
             name string
         }
 
-        func (d Dog) Name() string {
-            return d.name
+        func (d Dog) Speak() string {
+            return fmt.Sprintf("Woof! My name is %s", d.name)
         }
 
 ---
 
 ### Lambdas / Linq
+##### It does have anonymous functions and function types, though
 
         package main
 
         import (
             "fmt"
         )
+
+        type Accumulator func(int, int) int
 
         func main() {
             data := []int{1, 3, 2}
@@ -307,14 +400,13 @@ class: center, middle
             fmt.Printf("Max: %d\n", max)
         }
 
-        func accumulate(data []int, operation func(int, int) int) int {
+        func accumulate(data []int, operation Accumulator) int {
             acc := 0
             for _, v := range data {
                 acc = operation(acc, v)
             }
             return acc
         }
-
 
 ---
 
@@ -331,7 +423,7 @@ class: center, middle
             d, _ := time.ParseDuration("1s")
 
             // fmt.Println(d.Milliseconds()) // Doesn't exist!
-            fmt.Println(d.Nanoseconds() / 1e6) // 100,000 nanoseconds per millisecond
+            fmt.Println(d.Nanoseconds() / 1e6) // 1,000,000 nanoseconds per millisecond
         }
 
 ---
@@ -483,7 +575,10 @@ class: center, middle
 
 - Simplicity
 - Performance
+- Easy to understand type system
 - Go routines and channels
+- Useful zero values
+- Multiple named return values
 - Excellent and fast build tooling
 
 ---
@@ -563,11 +658,12 @@ class: center, middle
 # Stuff that Go has that surprised me...
 
 - Built in
-  - Unit testing 
+  - Unit testing
   - Code coverage
   - Benchmark tool
   - Formatting tool
   - Vetting tool
+  - Documentation tool (with interactive examples)
   - Deadlock detection tool
   - Memory profiler
   - CPU profiler
@@ -584,9 +680,11 @@ class: center, middle
 
         go build ./...
         go test ./... -cover
+        go test ./... -bench
         go fmt
         go vet
         go get
+        go doc
 
     </textarea>
   <script src="remark-latest.min.js" type="text/javascript">
