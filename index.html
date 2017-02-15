@@ -31,7 +31,7 @@
     .remark-code,
     .remark-inline-code {
       font-family: 'Ubuntu Mono';
-      font-size: small;
+      font-size: large;
     }
 
     .titleImage {
@@ -47,7 +47,7 @@
 </head>
 
 <body>
-  <textarea id="source">
+  <textarea id="source" lang="en">
 
 class: center, middle
 
@@ -214,8 +214,7 @@ class: center, middle
 
 ---
 
-### Inheritance
-##### But we prefer composition over inheritance anyway, right?
+Inheritance - but we prefer composition over inheritance anyway, right?
 
         package main
 
@@ -239,8 +238,7 @@ class: center, middle
 
 ---
 
-### Or, in fact, classes
-##### But any type can have methods
+Or, in fact, classes, but any type can have methods...
 
         package main
 
@@ -269,7 +267,7 @@ class: center, middle
 
 ---
 
-##### Even function types
+Even function types...
 
         package main
 
@@ -302,7 +300,7 @@ class: center, middle
 
 ---
 
-### Generics
+Generics
 
         package main
 
@@ -336,10 +334,7 @@ class: center, middle
 
 ---
 
-### Interfaces that define data
-##### In Go, they define functionality and are implemented implicitly
-
-        package main
+Interfaces that define data
 
         import "fmt"
 
@@ -376,8 +371,7 @@ class: center, middle
 
 ---
 
-### Lambdas / Linq
-##### It does have anonymous functions and function types, though
+Lambdas / Linq (it has anonymous functions and function types, though)
 
         package main
 
@@ -411,7 +405,7 @@ class: center, middle
 
 ---
 
-### A milliseconds function on Duration
+A milliseconds function on Duration
 
         package main
 
@@ -429,7 +423,7 @@ class: center, middle
 
 ---
 
-### A math.Float function
+A math.Float function
 
         package main
 
@@ -456,7 +450,7 @@ class: center, middle
 
 ---
 
-### Python's range function
+Python's range function
 
         package main
 
@@ -477,7 +471,7 @@ class: center, middle
 
 ---
 
-### Python's range function
+Python's range function
 
         package main
 
@@ -502,14 +496,14 @@ class: center, middle
 
 ---
 
-### A Decimal type
+A Decimal type
 
 - Use int64 for cents / pence if you don't need to deal with partial monetary values
 - Use a decimal type if you really have to e.g. https://github.com/shopspring/decimal
 
 ---
 
-### Try / Catch - the OK pattern
+Try / Catch - the OK pattern
 
         package main
 
@@ -539,7 +533,7 @@ class: center, middle
 
 ---
 
-### Try / Catch - the nil err pattern
+Try / Catch - the nil err pattern
 
         package main
 
@@ -572,6 +566,27 @@ class: center, middle
 
 ---
 
+Try / Catch / Finally - the defer pattern
+
+        package main
+
+        import (
+            "fmt"
+            "time"
+        )
+
+        func main() {
+            t := time.Now()
+            defer func() { fmt.Printf("Then this, %v later.\n", time.Since(t)) }()
+            time.Sleep(time.Nanosecond)
+            fmt.Println("This prints out.")
+        }
+
+        // This prints out.
+        // Then this, 1ns later.
+
+---
+
 # What unique stuff does Go have?
 
 - Simplicity
@@ -584,11 +599,7 @@ class: center, middle
 
 ---
 
-### Pointer receivers
-
-       package main
-
-        import "fmt"
+Pointer receivers
 
         func main() {
             p := Person{name: "John"}
@@ -606,11 +617,9 @@ class: center, middle
         type Person struct {
             name string
         }
-
         func (p Person) Name() string {
             return p.name
         }
-
         func (p *Person) SetName(nn string) {
             p.name = nn
         }
@@ -618,18 +627,16 @@ class: center, middle
         type Dog struct {
             name string
         }
-
         func (d Dog) Name() string {
             return d.name
         }
-
         func (d Dog) SetName(nn string) {
             d.name = nn
         }
 
 ---
 
-### Go routine example from Go tour
+Go routines and channels (example from Go tour)
 
         package main
 
@@ -651,9 +658,12 @@ class: center, middle
             go sum(s[len(s)/2:], c)
             x, y := <-c, <-c // receive from c
 
-            fmt.Println(x, y, x+y)
+            fmt.Println(x, y)
+            fmt.Println(x+y)
         }
 
+        // -5 17 
+        // 12
 ---
 
 # Stuff that Go has that surprised me...
